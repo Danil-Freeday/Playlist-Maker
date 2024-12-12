@@ -5,58 +5,70 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val layoutRes = getLayoutForTheme()
+
+        // Определение макета на основе темы
+
+        val selectedLayout = determineThemeLayout()
         super.onCreate(savedInstanceState)
-        setContentView(layoutRes)
+        setContentView(selectedLayout)
 
-        setupUI()
+        // Настройка интерфейса
 
-        val receiver = object : BroadcastReceiver() {
+        initializeUI()
+
+        // Регистрация локального широковещательного приемника для обновления темы
+
+        val themeUpdateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                setContentView(getLayoutForTheme())
-                setupUI()
+                setContentView(determineThemeLayout())
+                initializeUI()
             }
         }
         LocalBroadcastManager.getInstance(this)
-            .registerReceiver(receiver, IntentFilter("com.example.UPDATE_THEME"))
+            .registerReceiver(themeUpdateReceiver, IntentFilter("com.example.UPDATE_THEME"))
+    }
 
-}
-    private fun setupUI(){
+    // Метод для настройки интерфейса
+
+    private fun initializeUI() {
         supportActionBar?.hide()
+
+        // Настройка кнопки перехода к настройкам
+
         val settingsButton = findViewById<Button>(R.id.button)
-        val buttonClickListener : View.OnClickListener = object : View.OnClickListener{
-            override fun onClick(v:View?){
-                val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
-                startActivity(settingsIntent)
-            }
+        settingsButton.setOnClickListener {
+            val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(settingsIntent)
         }
 
-        settingsButton.setOnClickListener(buttonClickListener)
+        // Настройка кнопки перехода к медиа
 
         val mediaButton = findViewById<Button>(R.id.button2)
-        mediaButton.setOnClickListener{
+        mediaButton.setOnClickListener {
             val mediaIntent = Intent(this@MainActivity, MediaActivity::class.java)
             startActivity(mediaIntent)
         }
 
+        // Настройка кнопки перехода к поиску
+
         val searchButton = findViewById<Button>(R.id.button3)
-        searchButton.setOnClickListener{
+        searchButton.setOnClickListener {
             val searchIntent = Intent(this@MainActivity, SearchActivity::class.java)
             startActivity(searchIntent)
         }
     }
 
+    // Метод для определения макета в зависимости от темы
 
-    private fun getLayoutForTheme(): Int {
-        val isDarkMode = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
-        return if (isDarkMode) R.layout.main_dark else R.layout.activity_main
+    private fun determineThemeLayout(): Int {
+        val isDarkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
+        return if (isDarkModeEnabled) R.layout.main_dark else R.layout.main_light
     }
-
 }

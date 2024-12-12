@@ -9,62 +9,75 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 
-
 class SearchActivity : AppCompatActivity() {
 
-    private var searchText: String = ""
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val layoutRes = getLayoutForTheme()
-        super.onCreate(savedInstanceState)
-        setContentView(layoutRes)
-        supportActionBar?.hide()
-        val searchInput = findViewById<EditText>(R.id.searchInput)
-        val clearButton = findViewById<ImageButton>(R.id.clearButton)
+    // Переменная для хранения текста поиска
+    private var currentSearchText: String = ""
 
-        searchInput.addTextChangedListener(object : TextWatcher {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Определение макета в зависимости от темы
+        val selectedLayout = determineThemeLayout()
+        super.onCreate(savedInstanceState)
+        setContentView(selectedLayout)
+
+        supportActionBar?.hide()
+
+        val searchInputField = findViewById<EditText>(R.id.searchInput)
+        val clearSearchButton = findViewById<ImageButton>(R.id.clearButton)
+
+        searchInputField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchText = s.toString()
-                if (s.isNullOrEmpty()) {
-                    clearButton.visibility = View.INVISIBLE
-                } else {
-                    clearButton.visibility = View.VISIBLE
-                }
+                currentSearchText = s.toString()
+
+                clearSearchButton.visibility = if (s.isNullOrEmpty()) View.INVISIBLE else View.VISIBLE
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        clearButton.setOnClickListener {
-            searchInput.text.clear()
-            hideKeyboard(searchInput)
+        // Настройка кнопки очистки поля ввода
+
+        clearSearchButton.setOnClickListener {
+            searchInputField.text.clear()
+            dismissKeyboard(searchInputField)
         }
 
-        val backButton = findViewById<ImageButton>(R.id.backButton)
-        backButton.setOnClickListener{
+        // Настройка кнопки возврата
+
+        val returnButton = findViewById<ImageButton>(R.id.backButton)
+        returnButton.setOnClickListener {
             finish()
         }
     }
 
-    private fun getLayoutForTheme(): Int {
-        val isDarkMode = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
-        return if (isDarkMode) R.layout.search_dark else R.layout.activity_search
+    // Метод для определения макета на основе текущей темы
+
+    private fun determineThemeLayout(): Int {
+        val isDarkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
+        return if (isDarkModeEnabled) R.layout.search_dark else R.layout.search_light
     }
 
-    private fun hideKeyboard(view: View) {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    // Метод для скрытия клавиатуры
+
+    private fun dismissKeyboard(view: View) {
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+    // Сохранение состояния текста поиска при изменении конфигурации
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("SEARCH_TEXT", searchText)
+        outState.putString("SEARCH_TEXT", currentSearchText)
     }
+
+    // Восстановление текста поиска из сохраненного состояния
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        val restoredText = savedInstanceState.getString("SEARCH_TEXT", "")
-        findViewById<EditText>(R.id.searchInput).setText(restoredText)
+        val restoredSearchText = savedInstanceState.getString("SEARCH_TEXT", "")
+        findViewById<EditText>(R.id.searchInput).setText(restoredSearchText)
     }
 }
