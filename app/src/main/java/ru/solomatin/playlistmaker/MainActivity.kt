@@ -1,5 +1,6 @@
 package ru.solomatin.playlistmaker
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,10 +20,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(selectedLayout)
 
-        // Настройка интерфейса
-
-        initializeUI()
-
         // Регистрация локального широковещательного приемника для обновления темы
 
         val themeUpdateReceiver = object : BroadcastReceiver() {
@@ -33,12 +30,24 @@ class MainActivity : AppCompatActivity() {
         }
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(themeUpdateReceiver, IntentFilter("com.example.UPDATE_THEME"))
+
+        // Настройка интерфейса
+
+        initializeUI()
     }
 
-    // Метод для настройки интерфейса
+    // Метод для определения макета в зависимости от темы
 
-    private fun initializeUI() {
-        supportActionBar?.hide()
+        @SuppressLint("SuspiciousIndentation")
+        private fun determineThemeLayout(): Int {
+            val isDarkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
+                return if (isDarkModeEnabled) R.layout.main_dark else R.layout.main_light
+    }
+
+         // Метод для настройки интерфейса
+
+          private fun initializeUI() {
+             supportActionBar?.hide()
 
         // Настройка кнопки перехода к настройкам
 
@@ -65,10 +74,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Метод для определения макета в зависимости от темы
-
-    private fun determineThemeLayout(): Int {
-        val isDarkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
-        return if (isDarkModeEnabled) R.layout.main_dark else R.layout.main_light
-    }
 }

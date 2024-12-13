@@ -64,7 +64,7 @@ class SettingsActivity : AppCompatActivity() {
         appShareButton.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, "Группа ИС-211")
+                putExtra(Intent.EXTRA_TEXT, "ИС-211")
             }
 
             startActivity(Intent.createChooser(sharingIntent, "Поделиться приложением через"))
@@ -103,18 +103,20 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    // Определение макета на основе темы (темная или светлая)
+        // Сохранение предпочтений темы
 
-    private fun determineLayoutBasedOnTheme(): Int {
-        val darkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
-        return if (darkModeEnabled) R.layout.settings_dark else R.layout.settings_light
+         private fun persistThemePreference(darkModeEnabled: Boolean) {
+             val editor = getSharedPreferences("AppPrefs", MODE_PRIVATE).edit()
+                editor.putBoolean("DARK_MODE", darkModeEnabled)
+                 editor.apply()
     }
 
-    // Сохранение предпочтений темы
+        // Определение макета на основе темы (темная или светлая)
 
-    private fun persistThemePreference(darkModeEnabled: Boolean) {
-        val editor = getSharedPreferences("AppPrefs", MODE_PRIVATE).edit()
-        editor.putBoolean("DARK_MODE", darkModeEnabled)
-        editor.apply()
+         private fun determineLayoutBasedOnTheme(): Int {
+             val darkModeEnabled = getSharedPreferences("AppPrefs", MODE_PRIVATE).getBoolean("DARK_MODE", false)
+                return if (darkModeEnabled) R.layout.settings_dark else R.layout.settings_light
     }
+
+
 }

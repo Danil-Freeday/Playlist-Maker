@@ -15,12 +15,12 @@ class SearchActivity : AppCompatActivity() {
     private var currentSearchText: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         // Определение макета в зависимости от темы
+
         val selectedLayout = determineThemeLayout()
         super.onCreate(savedInstanceState)
         setContentView(selectedLayout)
-
-        supportActionBar?.hide()
 
         val searchInputField = findViewById<EditText>(R.id.searchInput)
         val clearSearchButton = findViewById<ImageButton>(R.id.clearButton)
@@ -50,6 +50,7 @@ class SearchActivity : AppCompatActivity() {
         returnButton.setOnClickListener {
             finish()
         }
+        supportActionBar?.hide()
     }
 
     // Метод для определения макета на основе текущей темы
